@@ -18,9 +18,21 @@ from .models import (
 from .game_service import GameService
 from .image_service import ImageService
 
-# Initialize services
-game_service = GameService()
-image_service = ImageService()
+# Initialize services lazily
+game_service = None
+image_service = None
+
+def get_game_service():
+    global game_service
+    if game_service is None:
+        game_service = GameService()
+    return game_service
+
+def get_image_service():
+    global image_service
+    if image_service is None:
+        image_service = ImageService()
+    return image_service
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
