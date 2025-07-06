@@ -88,7 +88,7 @@ async def get_status_checks():
 async def create_character(request: CharacterCreateRequest):
     """Create a new character with generated sprite"""
     try:
-        character = await game_service.create_character(
+        character = await get_game_service().create_character(
             request.name, 
             request.character_class
         )
