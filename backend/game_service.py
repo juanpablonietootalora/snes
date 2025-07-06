@@ -8,9 +8,15 @@ logger = logging.getLogger(__name__)
 
 class GameService:
     def __init__(self):
-        self.image_service = ImageService()
+        self._image_service = None
         self.story_scenes = self._initialize_story_scenes()
         self.enemies = self._initialize_enemies()
+    
+    @property
+    def image_service(self):
+        if self._image_service is None:
+            self._image_service = ImageService()
+        return self._image_service
     
     def _initialize_story_scenes(self) -> List[StoryScene]:
         """Initialize the story scenes for the demo"""
