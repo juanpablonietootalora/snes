@@ -180,7 +180,7 @@ async def start_combat(game_state_id: str):
         demo_enemies = enemies[:2]
         
         # Calculate turn order
-        turn_order = game_service.calculate_combat_turn_order(game_state.party, demo_enemies)
+        turn_order = get_game_service().calculate_combat_turn_order(game_state.party, demo_enemies)
         
         # Create combat state
         combat_state = CombatState(
