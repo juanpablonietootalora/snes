@@ -1,13 +1,14 @@
 import asyncio
 from typing import List, Optional
 from .models import GameCharacter, Enemy, GameState, CombatState, StoryScene, CharacterClass
-from .image_service import image_service
+from .image_service import ImageService
 import logging
 
 logger = logging.getLogger(__name__)
 
 class GameService:
     def __init__(self):
+        self.image_service = ImageService()
         self.story_scenes = self._initialize_story_scenes()
         self.enemies = self._initialize_enemies()
     
@@ -113,7 +114,7 @@ class GameService:
         char_info = character_data[character_class]
         
         # Generate character sprite
-        sprite_response = await image_service.generate_character_sprite(
+        sprite_response = await self.image_service.generate_character_sprite(
             character_class.value, 
             name
         )
@@ -135,7 +136,7 @@ class GameService:
         updated_enemies = []
         
         for enemy in self.enemies:
-            sprite_response = await image_service.generate_enemy_sprite(
+            sprite_response = await self.image_service.generate_enemy_sprite(
                 enemy.name, 
                 enemy.type
             )
@@ -151,15 +152,15 @@ class GameService:
         
         for scene in self.story_scenes:
             if scene.title == "The Whispering Shadows":
-                bg_response = await image_service.generate_background(
+                bg_response = await self.image_service.generate_background(
                     "Dark library exterior at night, gothic architecture, mysterious mist, 1920s Arkham setting"
                 )
             elif scene.title == "The Cursed Library":
-                bg_response = await image_service.generate_background(
+                bg_response = await self.image_service.generate_background(
                     "Ancient library interior, towering bookshelves, glowing occult symbols, eerie atmosphere"
                 )
             else:
-                bg_response = await image_service.generate_background(
+                bg_response = await self.image_service.generate_background(
                     "Generic dark atmospheric scene, 1920s setting"
                 )
             
@@ -210,6 +211,3 @@ class GameService:
         random.shuffle(all_combatants)
         
         return [f"{entity_type}:{entity_id}" for entity_type, entity_id in all_combatants]
-
-# Global instance
-game_service = GameService()
