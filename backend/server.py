@@ -15,8 +15,12 @@ from .models import (
     GameCharacter, Enemy, GameState, CombatState, StoryScene, 
     CharacterClass, ImageGenerationRequest, ImageGenerationResponse
 )
-from .game_service import game_service
-from .image_service import image_service
+from .game_service import GameService
+from .image_service import ImageService
+
+# Initialize services
+game_service = GameService()
+image_service = ImageService()
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
