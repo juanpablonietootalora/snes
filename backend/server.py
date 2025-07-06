@@ -140,7 +140,7 @@ async def initialize_game():
 async def get_story_scenes():
     """Get all story scenes"""
     try:
-        scenes = await game_service.generate_scene_backgrounds()
+        scenes = await get_game_service().generate_scene_backgrounds()
         return {"scenes": scenes}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
