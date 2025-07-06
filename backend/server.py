@@ -175,7 +175,7 @@ async def start_combat(game_state_id: str):
         game_state = GameState(**game_state_doc)
         
         # Get enemies for combat
-        enemies = await game_service.generate_enemy_sprites()
+        enemies = await get_game_service().generate_enemy_sprites()
         # Use first two enemies for demo
         demo_enemies = enemies[:2]
         
