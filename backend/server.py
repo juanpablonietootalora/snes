@@ -158,7 +158,7 @@ async def get_enemies():
 async def generate_image(request: ImageGenerationRequest):
     """Generate a custom image"""
     try:
-        response = await image_service.generate_image(request)
+        response = await get_image_service().generate_image(request)
         return response
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
