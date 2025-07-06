@@ -32,3 +32,131 @@
         transform: rotate(360deg);
     }
 }
+
+/* Lovecraftian Horror JRPG Styles */
+.pixel-art {
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-crisp-edges;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+/* Dark atmospheric background */
+body {
+    background: linear-gradient(135deg, #2d1b69 0%, #11011a 50%, #000000 100%);
+    overflow-x: hidden;
+}
+
+/* Eldritch glow effects */
+.eldritch-glow {
+    box-shadow: 0 0 20px rgba(139, 69, 255, 0.3);
+    border: 1px solid rgba(139, 69, 255, 0.5);
+}
+
+/* Text shadows for readability */
+.text-shadow {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* Sanity meter pulse animation */
+.sanity-critical {
+    animation: pulse-red 2s infinite;
+}
+
+@keyframes pulse-red {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+/* Madness effects */
+.madness-level-1 {
+    filter: hue-rotate(15deg);
+}
+
+.madness-level-2 {
+    filter: hue-rotate(30deg) saturate(1.2);
+}
+
+.madness-level-3 {
+    filter: hue-rotate(45deg) saturate(1.4) contrast(1.1);
+    animation: madness-shake 0.5s infinite;
+}
+
+@keyframes madness-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    75% { transform: translateX(2px); }
+}
+
+/* Combat turn indicators */
+.combat-turn-active {
+    animation: glow-pulse 2s infinite;
+}
+
+@keyframes glow-pulse {
+    0%, 100% { 
+        box-shadow: 0 0 15px rgba(139, 69, 255, 0.5);
+    }
+    50% { 
+        box-shadow: 0 0 25px rgba(139, 69, 255, 0.8);
+    }
+}
+
+/* Story typing effect cursor */
+.typing-cursor {
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+/* Character creation hover effects */
+.character-card:hover {
+    transform: translateY(-5px);
+    transition: transform 0.3s ease;
+}
+
+/* Atmospheric particles */
+.particle {
+    position: absolute;
+    background: rgba(139, 69, 255, 0.1);
+    border-radius: 50%;
+    animation: float 6s infinite ease-in-out;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+/* Eldritch button effects */
+.eldritch-button {
+    background: linear-gradient(45deg, #4c1d95, #7c3aed);
+    border: 1px solid #8b5cf6;
+    transition: all 0.3s ease;
+}
+
+.eldritch-button:hover {
+    background: linear-gradient(45deg, #7c3aed, #a855f7);
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+    transform: translateY(-2px);
+}
+
+/* Horror game UI elements */
+.horror-card {
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid rgba(139, 69, 255, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+.ritual-progress {
+    background: linear-gradient(90deg, #7c2d12, #dc2626, #7c2d12);
+    animation: ritual-glow 2s infinite alternate;
+}
+
+@keyframes ritual-glow {
+    0% { box-shadow: 0 0 5px rgba(220, 38, 38, 0.5); }
+    100% { box-shadow: 0 0 20px rgba(220, 38, 38, 0.8); }
+}
