@@ -111,10 +111,10 @@ async def initialize_game():
     """Initialize the game with story scenes and enemies"""
     try:
         # Generate story scene backgrounds
-        story_scenes = await game_service.generate_scene_backgrounds()
+        story_scenes = await get_game_service().generate_scene_backgrounds()
         
         # Generate enemy sprites
-        enemies = await game_service.generate_enemy_sprites()
+        enemies = await get_game_service().generate_enemy_sprites()
         
         # Create initial game state
         game_state = GameState(
