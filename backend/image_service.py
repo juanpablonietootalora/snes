@@ -92,6 +92,3 @@ class ImageService:
         )
         
         return await self.generate_image(request)
-
-# Global instance
-image_service = ImageService()
