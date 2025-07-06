@@ -103,7 +103,7 @@ async def create_character(request: CharacterCreateRequest):
 @api_router.get("/character/abilities/{character_class}")
 async def get_character_abilities(character_class: CharacterClass):
     """Get abilities for a character class"""
-    abilities = game_service.get_character_abilities(character_class)
+    abilities = get_game_service().get_character_abilities(character_class)
     return {"character_class": character_class, "abilities": abilities}
 
 @api_router.get("/game/initialize")
