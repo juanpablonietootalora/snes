@@ -149,7 +149,7 @@ async def get_story_scenes():
 async def get_enemies():
     """Get all enemies with sprites"""
     try:
-        enemies = await game_service.generate_enemy_sprites()
+        enemies = await get_game_service().generate_enemy_sprites()
         return {"enemies": enemies}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
