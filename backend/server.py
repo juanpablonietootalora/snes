@@ -175,6 +175,18 @@ async def get_character_animation_frames(character_class: str, animation_type: s
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.post("/upload/sprite-sheet")
+async def upload_sprite_sheet(sprite_data: dict):
+    """Upload the healer sprite sheet"""
+    try:
+        if "base64_data" in sprite_data:
+            get_image_service().update_healer_sprite_sheet(sprite_data["base64_data"])
+            return {"success": True, "message": "Healer sprite sheet uploaded successfully"}
+        else:
+            raise HTTPException(status_code=400, detail="base64_data is required")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.post("/combat/start")
 async def start_combat(game_state_id: str):
     """Start combat with demo enemies"""
