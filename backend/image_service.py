@@ -15,6 +15,10 @@ class ImageService:
         self.api_key = os.environ.get('GEMINI_API_KEY')
         self.use_gemini = self.api_key is not None
         
+        # Load the real healer sprite sheet (placeholder for now, will be replaced with actual file)
+        self.healer_sprite_sheet = None
+        self.load_healer_sprite_sheet()
+        
         if self.use_gemini:
             try:
                 self.image_gen = GeminiImageGeneration(api_key=self.api_key)
@@ -25,13 +29,114 @@ class ImageService:
         else:
             logger.info("No Gemini API key found. Using placeholder images.")
     
-    def get_healer_sprite_frames(self) -> dict:
-        """Extract individual frames from the healer sprite sheet"""
-        # The sprite sheet has 4 rows (IDLE, WALK, ATTACK1, ATTACK2) with 6 frames each
+    def load_healer_sprite_sheet(self):
+        """Load the actual healer sprite sheet from the user"""
+        # For now, I'll create a method that can be easily updated with the real sprite sheet
+        # The user's sprite sheet has 4 rows (IDLE, WALK, ATTACK1, ATTACK2) with 6 frames each
         # Each frame appears to be approximately 32x32 pixels
         
-        # For now, I'll create a high-quality SNES-style healer sprite programmatically
-        # based on the style shown in the image
+        # TODO: Replace this with the actual sprite sheet data
+        # This should be the base64 data of the user's uploaded PNG
+        self.healer_sprite_sheet_b64 = None
+        
+        # Create a temporary method to handle the sprite sheet when provided
+        logger.info("Healer sprite sheet placeholder loaded - waiting for real sprite data")
+    
+    def extract_sprite_frame(self, sprite_sheet_img, row: int, col: int, frame_width: int = 32, frame_height: int = 32) -> str:
+        """Extract a single frame from the sprite sheet"""
+        if sprite_sheet_img is None:
+            return self.create_placeholder_healer_frame()
+        
+        # Calculate the position of the frame
+        x = col * frame_width
+        y = row * frame_height
+        
+        # Extract the frame
+        frame = sprite_sheet_img.crop((x, y, x + frame_width, y + frame_height))
+        
+        # Convert to base64
+        buffer = io.BytesIO()
+        frame.save(buffer, format='PNG')
+        img_str = base64.b64encode(buffer.getvalue()).decode()
+        return img_str
+    
+    def get_real_healer_frames(self) -> dict:
+        """Get frames from the actual sprite sheet"""
+        if self.healer_sprite_sheet_b64 is None:
+            # Return placeholder frames until real sprite sheet is loaded
+            return self.get_placeholder_healer_frames()
+        
+        try:
+            # Decode the sprite sheet
+            sprite_data = base64.b64decode(self.healer_sprite_sheet_b64)
+            sprite_img = Image.open(io.BytesIO(sprite_data))
+            
+            frames = {
+                'idle': [],
+                'walk': [],
+                'attack1': [],
+                'attack2': []
+            }
+            
+            # Extract frames from each row
+            animation_types = ['idle', 'walk', 'attack1', 'attack2']
+            
+            for row, animation in enumerate(animation_types):
+                for col in range(6):  # 6 frames per animation
+                    frame = self.extract_sprite_frame(sprite_img, row, col)
+                    frames[animation].append(frame)
+            
+            return frames
+            
+        except Exception as e:
+            logger.error(f"Error loading real sprite sheet: {e}")
+            return self.get_placeholder_healer_frames()
+    
+    def create_placeholder_healer_frame(self) -> str:
+        """Create a single placeholder frame that looks more like the reference"""
+        img = Image.new('RGBA', (32, 32), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(img)
+        
+        # Colors matching the user's reference sprite (purple hooded character)
+        colors = {
+            'hood_dark': (80, 60, 120),
+            'hood_med': (120, 90, 160), 
+            'hood_light': (160, 120, 200),
+            'face': (240, 200, 160),
+            'robe_dark': (60, 40, 80),
+            'robe_med': (80, 60, 100),
+            'cross': (200, 180, 140),
+            'eyes': (255, 255, 200)
+        }
+        
+        # Draw purple hood
+        draw.ellipse([6, 4, 26, 18], fill=colors['hood_dark'])
+        draw.ellipse([8, 5, 24, 16], fill=colors['hood_med'])
+        draw.ellipse([10, 6, 22, 14], fill=colors['hood_light'])
+        
+        # Face
+        draw.ellipse([12, 8, 20, 16], fill=colors['face'])
+        
+        # Eyes
+        draw.rectangle([13, 10, 14, 11], fill=colors['eyes'])
+        draw.rectangle([17, 10, 18, 11], fill=colors['eyes'])
+        
+        # Robe body
+        draw.rectangle([10, 16, 22, 28], fill=colors['robe_dark'])
+        draw.rectangle([11, 17, 21, 27], fill=colors['robe_med'])
+        
+        # Medical cross
+        draw.rectangle([15, 19, 17, 23], fill=colors['cross'])
+        draw.rectangle([13, 20, 19, 22], fill=colors['cross'])
+        
+        # Convert to base64
+        buffer = io.BytesIO()
+        img.save(buffer, format='PNG')
+        img_str = base64.b64encode(buffer.getvalue()).decode()
+        return img_str
+    
+    def get_placeholder_healer_frames(self) -> dict:
+        """Get placeholder frames until real sprite sheet is loaded"""
         frames = {
             'idle': [],
             'walk': [],
@@ -39,112 +144,22 @@ class ImageService:
             'attack2': []
         }
         
-        # Create SNES-quality healer frames based on the reference image
+        # Create 6 frames for each animation type
         for animation_type in frames.keys():
             for frame_num in range(6):
-                frame = self.create_snes_healer_frame(animation_type, frame_num)
+                frame = self.create_placeholder_healer_frame()
                 frames[animation_type].append(frame)
         
         return frames
     
-    def create_snes_healer_frame(self, animation_type: str, frame_num: int) -> str:
-        """Create an individual SNES-style healer frame based on the reference sprite"""
-        img = Image.new('RGBA', (32, 32), (0, 0, 0, 0))
-        draw = ImageDraw.Draw(img)
-        
-        # SNES-style color palette matching the reference sprite
-        colors = {
-            # Purple hood/robe
-            'hood_dark': (80, 60, 120),
-            'hood_med': (120, 90, 160),
-            'hood_light': (160, 120, 200),
-            
-            # Face/skin
-            'skin_base': (240, 200, 160),
-            'skin_shadow': (200, 160, 120),
-            
-            # Dark robe body
-            'robe_dark': (60, 40, 80),
-            'robe_med': (80, 60, 100),
-            'robe_light': (100, 80, 120),
-            
-            # Cross/medical symbol
-            'cross': (200, 180, 140),
-            
-            # Magic effects (for attack frames)
-            'magic_green': (100, 255, 100),
-            'magic_glow': (200, 255, 200),
-            
-            # Outline
-            'outline': (20, 15, 30)
-        }
-        
-        # Base character (slightly adjust position based on animation)
-        offset_x = 0
-        offset_y = 0
-        
-        if animation_type == 'walk':
-            # Slight bobbing motion for walk
-            offset_y = -1 if frame_num % 2 == 0 else 0
-            offset_x = (-1 if frame_num < 3 else 1) if frame_num % 6 < 4 else 0
-        elif animation_type == 'idle':
-            # Subtle breathing motion
-            offset_y = -1 if frame_num in [1, 4] else 0
-        
-        # Draw the healer character
-        # Hood
-        draw.ellipse([6 + offset_x, 4 + offset_y, 26 + offset_x, 18 + offset_y], fill=colors['hood_dark'])
-        draw.ellipse([8 + offset_x, 5 + offset_y, 24 + offset_x, 16 + offset_y], fill=colors['hood_med'])
-        draw.ellipse([10 + offset_x, 6 + offset_y, 22 + offset_x, 14 + offset_y], fill=colors['hood_light'])
-        
-        # Face (partially hidden in hood)
-        draw.ellipse([12 + offset_x, 8 + offset_y, 20 + offset_x, 16 + offset_y], fill=colors['skin_base'])
-        draw.ellipse([12 + offset_x, 8 + offset_y, 18 + offset_x, 14 + offset_y], fill=colors['skin_shadow'])
-        
-        # Eyes (small glowing dots)
-        draw.rectangle([13 + offset_x, 10 + offset_y, 14 + offset_x, 11 + offset_y], fill=(255, 255, 200))
-        draw.rectangle([17 + offset_x, 10 + offset_y, 18 + offset_x, 11 + offset_y], fill=(255, 255, 200))
-        
-        # Body/Robe
-        draw.rectangle([10 + offset_x, 16 + offset_y, 22 + offset_x, 28 + offset_y], fill=colors['robe_dark'])
-        draw.rectangle([11 + offset_x, 17 + offset_y, 21 + offset_x, 27 + offset_y], fill=colors['robe_med'])
-        
-        # Medical cross on chest
-        draw.rectangle([15 + offset_x, 19 + offset_y, 17 + offset_x, 23 + offset_y], fill=colors['cross'])
-        draw.rectangle([13 + offset_x, 20 + offset_y, 19 + offset_x, 22 + offset_y], fill=colors['cross'])
-        
-        # Arms (simple)
-        draw.rectangle([8 + offset_x, 18 + offset_y, 11 + offset_x, 22 + offset_y], fill=colors['robe_dark'])
-        draw.rectangle([21 + offset_x, 18 + offset_y, 24 + offset_x, 22 + offset_y], fill=colors['robe_dark'])
-        
-        # Add animation-specific effects
-        if animation_type == 'attack1':
-            # Green magic effects around hands
-            magic_alpha = 200 if frame_num < 3 else 100
-            draw.ellipse([6 + offset_x, 17 + offset_y, 10 + offset_x, 21 + offset_y], fill=colors['magic_green'])
-            draw.ellipse([7 + offset_x, 18 + offset_y, 9 + offset_x, 20 + offset_y], fill=colors['magic_glow'])
-            
-            draw.ellipse([22 + offset_x, 17 + offset_y, 26 + offset_x, 21 + offset_y], fill=colors['magic_green'])
-            draw.ellipse([23 + offset_x, 18 + offset_y, 25 + offset_x, 20 + offset_y], fill=colors['magic_glow'])
-            
-        elif animation_type == 'attack2':
-            # Special transformation/shadow effect
-            if frame_num >= 4:
-                # Dark shadow overlay
-                draw.rectangle([0, 0, 32, 32], fill=(0, 0, 0, 100))
-                # Glowing eyes
-                draw.rectangle([13 + offset_x, 10 + offset_y, 14 + offset_x, 11 + offset_y], fill=(255, 0, 0))
-                draw.rectangle([17 + offset_x, 10 + offset_y, 18 + offset_x, 11 + offset_y], fill=(255, 0, 0))
-        
-        # Feet
-        draw.ellipse([12 + offset_x, 26 + offset_y, 16 + offset_x, 29 + offset_y], fill=colors['robe_dark'])
-        draw.ellipse([16 + offset_x, 26 + offset_y, 20 + offset_x, 29 + offset_y], fill=colors['robe_dark'])
-        
-        # Convert to base64
-        buffer = io.BytesIO()
-        img.save(buffer, format='PNG')
-        img_str = base64.b64encode(buffer.getvalue()).decode()
-        return img_str
+    def update_healer_sprite_sheet(self, sprite_sheet_b64: str):
+        """Update the healer sprite sheet with real data"""
+        self.healer_sprite_sheet_b64 = sprite_sheet_b64
+        logger.info("Real healer sprite sheet loaded successfully!")
+    
+    def get_healer_sprite_frames(self) -> dict:
+        """Get healer animation frames (real or placeholder)"""
+        return self.get_real_healer_frames()
     
     def get_healer_portrait(self) -> str:
         """Get the first idle frame for character portrait"""
