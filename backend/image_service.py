@@ -24,56 +24,209 @@ class ImageService:
         else:
             logger.info("No Gemini API key found. Using placeholder images.")
     
-    def create_placeholder_sprite(self, character_class: str = "detective", enemy_type: str = "cultist") -> str:
-        """Create a simple 64x64 pixel art sprite"""
-        # Create a 64x64 image
+    def create_snes_healer_sprite(self) -> str:
+        """Create an authentic SNES-style healer sprite using 16-bit techniques"""
+        # Create a 64x64 sprite for better detail
         img = Image.new('RGBA', (64, 64), (0, 0, 0, 0))
         draw = ImageDraw.Draw(img)
         
-        # Color schemes for different types
+        # SNES-era color palette for healer (plague doctor theme)
         colors = {
-            "detective": [(139, 69, 19), (160, 82, 45), (210, 180, 140)],  # Brown detective
-            "witch": [(75, 0, 130), (138, 43, 226), (106, 90, 205)],       # Purple witch
-            "scientist": [(34, 139, 34), (50, 205, 50), (124, 252, 0)],     # Green scientist
-            "healer": [(178, 34, 34), (220, 20, 60), (255, 99, 71)],        # Red healer
-            "cultist": [(25, 25, 112), (72, 61, 139), (123, 104, 238)],     # Dark blue cultist
-            "cosmic_horror": [(85, 107, 47), (107, 142, 35), (154, 205, 50)], # Olive horror
-            "boss": [(139, 0, 0), (205, 92, 92), (255, 160, 122)]           # Dark red boss
+            # Plague doctor mask (dark leather)
+            'mask_dark': (45, 35, 25),
+            'mask_med': (65, 50, 35),
+            'mask_light': (85, 65, 45),
+            
+            # Beak (weathered brown)
+            'beak_dark': (70, 45, 25),
+            'beak_light': (95, 65, 40),
+            
+            # Robes (deep crimson)
+            'robe_shadow': (80, 20, 20),
+            'robe_dark': (120, 30, 30),
+            'robe_med': (160, 40, 40),
+            'robe_light': (200, 60, 60),
+            
+            # Cross/medical symbol (bone white)
+            'cross_white': (240, 235, 220),
+            'cross_shadow': (200, 195, 180),
+            
+            # Eyes (glowing through mask)
+            'eye_glow': (255, 200, 100),
+            'eye_core': (255, 255, 150),
+            
+            # Gloves (dark leather)
+            'glove_dark': (40, 30, 20),
+            'glove_light': (60, 45, 30),
+            
+            # Outline
+            'outline': (15, 10, 10)
         }
         
-        sprite_type = character_class if character_class in colors else enemy_type
-        color_scheme = colors.get(sprite_type, colors["detective"])
+        # Main outline shape (SNES games used clean outlines)
+        # Head/Mask outline
+        draw.ellipse([18, 12, 46, 35], outline=colors['outline'], width=1)
         
-        # Draw a simple humanoid figure
-        # Head
-        draw.ellipse([22, 8, 42, 28], fill=color_scheme[2])
+        # Body outline
+        draw.rectangle([20, 35, 44, 58], outline=colors['outline'], width=1)
         
-        # Body
-        draw.rectangle([26, 28, 38, 48], fill=color_scheme[0])
+        # Robe outline
+        draw.polygon([(16, 40), (48, 40), (52, 62), (12, 62)], outline=colors['outline'], width=1)
         
-        # Arms
-        draw.rectangle([18, 30, 26, 44], fill=color_scheme[1])
-        draw.rectangle([38, 30, 46, 44], fill=color_scheme[1])
+        # Fill the mask (plague doctor mask with proper shading)
+        # Base mask color
+        draw.ellipse([19, 13, 45, 34], fill=colors['mask_med'])
         
-        # Legs
-        draw.rectangle([28, 48, 34, 58], fill=color_scheme[0])
-        draw.rectangle([34, 48, 40, 58], fill=color_scheme[0])
+        # Mask shading (left side darker for depth)
+        draw.ellipse([19, 13, 35, 34], fill=colors['mask_dark'])
+        draw.ellipse([29, 13, 45, 34], fill=colors['mask_light'])
         
-        # Add class-specific details
+        # Plague doctor beak
+        # Beak base
+        draw.polygon([(32, 28), (26, 36), (38, 36)], fill=colors['beak_dark'])
+        # Beak highlight
+        draw.polygon([(32, 28), (29, 33), (32, 34)], fill=colors['beak_light'])
+        
+        # Eyes (glowing through mask holes)
+        draw.ellipse([24, 18, 28, 22], fill=colors['eye_glow'])
+        draw.ellipse([25, 19, 27, 21], fill=colors['eye_core'])
+        
+        draw.ellipse([36, 18, 40, 22], fill=colors['eye_glow'])
+        draw.ellipse([37, 19, 39, 21], fill=colors['eye_core'])
+        
+        # Body (medical robes with proper SNES shading)
+        # Main robe body
+        draw.rectangle([21, 36, 43, 57], fill=colors['robe_med'])
+        
+        # Robe shadows (left side and bottom)
+        draw.rectangle([21, 36, 28, 57], fill=colors['robe_dark'])
+        draw.rectangle([21, 50, 43, 57], fill=colors['robe_shadow'])
+        
+        # Robe highlights (right side)
+        draw.rectangle([36, 36, 43, 49], fill=colors['robe_light'])
+        
+        # Extended robe bottom
+        draw.polygon([(17, 41), (47, 41), (51, 61), (13, 61)], fill=colors['robe_dark'])
+        draw.polygon([(17, 41), (47, 41), (47, 55), (17, 55)], fill=colors['robe_med'])
+        
+        # Medical cross on chest (SNES-style clean lines)
+        # Vertical part of cross
+        draw.rectangle([30, 42, 34, 52], fill=colors['cross_white'])
+        draw.rectangle([30, 42, 32, 52], fill=colors['cross_shadow'])
+        
+        # Horizontal part of cross
+        draw.rectangle([26, 45, 38, 49], fill=colors['cross_white'])
+        draw.rectangle([26, 45, 38, 47], fill=colors['cross_shadow'])
+        
+        # Arms/sleeves
+        # Left arm
+        draw.ellipse([12, 38, 22, 48], fill=colors['robe_dark'])
+        draw.ellipse([14, 40, 20, 46], fill=colors['robe_med'])
+        
+        # Right arm
+        draw.ellipse([42, 38, 52, 48], fill=colors['robe_dark'])
+        draw.ellipse([44, 40, 50, 46], fill=colors['robe_med'])
+        
+        # Gloved hands
+        # Left hand
+        draw.ellipse([10, 44, 16, 50], fill=colors['glove_dark'])
+        draw.ellipse([12, 45, 15, 48], fill=colors['glove_light'])
+        
+        # Right hand
+        draw.ellipse([48, 44, 54, 50], fill=colors['glove_dark'])
+        draw.ellipse([49, 45, 52, 48], fill=colors['glove_light'])
+        
+        # Feet (just visible under robe)
+        draw.ellipse([24, 58, 30, 62], fill=colors['glove_dark'])
+        draw.ellipse([34, 58, 40, 62], fill=colors['glove_dark'])
+        
+        # Add some weathering/detail (SNES games had small details)
+        # Small stains on robe
+        draw.rectangle([25, 45, 26, 46], fill=colors['robe_shadow'])
+        draw.rectangle([38, 50, 39, 51], fill=colors['robe_shadow'])
+        
+        # Convert to base64
+        buffer = io.BytesIO()
+        img.save(buffer, format='PNG')
+        img_str = base64.b64encode(buffer.getvalue()).decode()
+        return img_str
+    
+    def create_placeholder_sprite(self, character_class: str = "detective", enemy_type: str = "cultist") -> str:
+        """Create SNES-style sprites with improved techniques"""
+        if character_class == "healer":
+            return self.create_snes_healer_sprite()
+        
+        # For other classes, use the original method but improved
+        img = Image.new('RGBA', (64, 64), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(img)
+        
+        # Enhanced color schemes with SNES-style palettes
+        colors = {
+            "detective": {
+                'outline': (20, 15, 10),
+                'coat_dark': (70, 45, 20),
+                'coat_med': (100, 65, 30),
+                'coat_light': (130, 85, 40),
+                'hat': (25, 20, 15),
+                'skin': (210, 180, 140),
+                'badge': (255, 215, 0)
+            },
+            "witch": {
+                'outline': (25, 0, 35),
+                'robe_dark': (50, 20, 80),
+                'robe_med': (75, 35, 120),
+                'robe_light': (100, 50, 160),
+                'hat': (35, 15, 60),
+                'skin': (210, 180, 140),
+                'crystal': (200, 200, 255)
+            },
+            "scientist": {
+                'outline': (20, 30, 20),
+                'coat_white': (240, 240, 240),
+                'coat_shadow': (200, 200, 200),
+                'goggles': (120, 120, 120),
+                'mutation': (100, 255, 100),
+                'skin': (210, 180, 140),
+                'glass': (180, 220, 255)
+            }
+        }
+        
+        sprite_type = character_class if character_class in colors else "detective"
+        color_scheme = colors[sprite_type]
+        
+        # Draw with outlines (SNES style)
+        # Head outline and fill
+        draw.ellipse([22, 8, 42, 28], outline=color_scheme['outline'], width=1)
+        draw.ellipse([23, 9, 41, 27], fill=color_scheme['skin'])
+        
+        # Body outline and fill
+        draw.rectangle([26, 28, 38, 48], outline=color_scheme['outline'], width=1)
+        draw.rectangle([27, 29, 37, 47], fill=color_scheme.get('coat_med', color_scheme['robe_med']))
+        
+        # Add class-specific details with proper SNES styling
         if character_class == "detective":
-            # Hat
-            draw.rectangle([20, 8, 44, 14], fill=(0, 0, 0))
+            # Detective hat with proper shading
+            draw.rectangle([20, 8, 44, 14], fill=color_scheme['hat'])
+            draw.rectangle([20, 8, 44, 11], fill=(10, 8, 5))  # Hat shadow
+            # Badge
+            draw.rectangle([29, 32, 35, 38], fill=color_scheme['badge'])
+            
         elif character_class == "witch":
-            # Pointed hat
-            draw.polygon([(32, 2), (26, 18), (38, 18)], fill=(25, 25, 112))
+            # Pointed hat with shading
+            draw.polygon([(32, 2), (26, 18), (38, 18)], fill=color_scheme['hat'])
+            draw.polygon([(32, 2), (29, 12), (32, 15)], fill=(20, 8, 40))  # Hat highlight
+            # Crystal ball
+            draw.ellipse([40, 20, 48, 28], fill=color_scheme['crystal'])
+            
         elif character_class == "scientist":
-            # Goggles
-            draw.ellipse([24, 12, 28, 16], fill=(255, 255, 255))
-            draw.ellipse([36, 12, 40, 16], fill=(255, 255, 255))
-        elif character_class == "healer":
-            # Cross symbol
-            draw.rectangle([30, 32, 34, 42], fill=(255, 255, 255))
-            draw.rectangle([26, 36, 38, 38], fill=(255, 255, 255))
+            # Goggles with reflection
+            draw.ellipse([24, 12, 28, 16], fill=color_scheme['goggles'])
+            draw.ellipse([36, 12, 40, 16], fill=color_scheme['goggles'])
+            draw.ellipse([25, 13, 27, 15], fill=color_scheme['glass'])
+            draw.ellipse([37, 13, 39, 15], fill=color_scheme['glass'])
+            # Lab coat
+            draw.rectangle([24, 28, 40, 48], fill=color_scheme['coat_white'])
+            draw.rectangle([24, 28, 28, 48], fill=color_scheme['coat_shadow'])
         
         # Convert to base64
         buffer = io.BytesIO()
@@ -82,21 +235,40 @@ class ImageService:
         return img_str
     
     def create_placeholder_background(self) -> str:
-        """Create a simple background image"""
-        img = Image.new('RGB', (256, 192), (25, 25, 112))  # Dark blue base
+        """Create a SNES-style background with proper techniques"""
+        img = Image.new('RGB', (256, 192), (25, 25, 60))  # Dark blue base
         draw = ImageDraw.Draw(img)
         
-        # Draw some atmospheric elements
-        # Fog/mist effect
+        # SNES-style layered background
+        # Sky gradient
+        for y in range(0, 100):
+            color_intensity = int(25 + (y * 0.3))
+            draw.line([(0, y), (256, y)], fill=(color_intensity, color_intensity, 60 + y // 3))
+        
+        # Building silhouettes with SNES-style details
+        building_colors = [(15, 15, 30), (20, 20, 35), (25, 25, 40)]
+        
+        for i in range(0, 256, 40):
+            height = 120 + (i % 40)
+            color = building_colors[i // 80 % len(building_colors)]
+            
+            # Main building
+            draw.rectangle([i, height, i+35, 192], fill=color)
+            
+            # Windows
+            for row in range(height + 10, 192, 15):
+                for col in range(i + 5, i + 30, 8):
+                    if (row + col) % 30 < 15:  # Some windows lit
+                        draw.rectangle([col, row, col+3, row+3], fill=(255, 255, 150))
+                    else:
+                        draw.rectangle([col, row, col+3, row+3], fill=(40, 40, 70))
+        
+        # Fog effect (SNES-style transparency simulation)
         for i in range(50):
             x = i * 5
             y = 150 + (i % 20)
-            draw.ellipse([x, y, x+10, y+8], fill=(75, 75, 112))
-        
-        # Buildings silhouette
-        for i in range(0, 256, 40):
-            height = 120 + (i % 40)
-            draw.rectangle([i, height, i+35, 192], fill=(15, 15, 30))
+            alpha_sim = (75, 75, 112) if i % 2 == 0 else (85, 85, 122)
+            draw.ellipse([x, y, x+10, y+8], fill=alpha_sim)
         
         # Convert to base64
         buffer = io.BytesIO()
@@ -127,11 +299,10 @@ class ImageService:
             except Exception as e:
                 logger.warning(f"Gemini generation failed: {e}. Using placeholder.")
         
-        # Fallback to programmatically generated placeholder
+        # Fallback to SNES-style placeholder
         if request.image_type == "background":
             placeholder = self.create_placeholder_background()
         else:
-            # For characters and enemies, extract the type from prompt or use default
             placeholder = self.create_placeholder_sprite()
             
         return ImageGenerationResponse(
@@ -165,7 +336,7 @@ class ImageService:
             except Exception as e:
                 logger.warning(f"Character sprite generation failed: {e}")
         
-        # Use programmatically generated placeholder
+        # Use SNES-style placeholder
         placeholder = self.create_placeholder_sprite(character_class=character_class)
         return ImageGenerationResponse(success=True, image_base64=placeholder)
     
@@ -194,7 +365,7 @@ class ImageService:
             except Exception as e:
                 logger.warning(f"Enemy sprite generation failed: {e}")
         
-        # Use programmatically generated placeholder
+        # Use SNES-style placeholder
         placeholder = self.create_placeholder_sprite(enemy_type=enemy_type)
         return ImageGenerationResponse(success=True, image_base64=placeholder)
     
@@ -215,6 +386,6 @@ class ImageService:
             except Exception as e:
                 logger.warning(f"Background generation failed: {e}")
         
-        # Use programmatically generated placeholder
+        # Use SNES-style placeholder
         placeholder = self.create_placeholder_background()
         return ImageGenerationResponse(success=True, image_base64=placeholder)
