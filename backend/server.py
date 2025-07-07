@@ -163,6 +163,18 @@ async def generate_image(request: ImageGenerationRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.get("/character/animations/{character_class}/{animation_type}")
+async def get_character_animation_frames(character_class: str, animation_type: str):
+    """Get animation frames for a character"""
+    try:
+        if character_class == "healer":
+            frames = await get_image_service().get_healer_animation_frames(animation_type)
+            return {"character_class": character_class, "animation_type": animation_type, "frames": frames}
+        else:
+            return {"character_class": character_class, "animation_type": animation_type, "frames": []}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.post("/combat/start")
 async def start_combat(game_state_id: str):
     """Start combat with demo enemies"""
