@@ -6,6 +6,7 @@ from fastapi import HTTPException
 from .models import ImageGenerationRequest, ImageGenerationResponse
 from PIL import Image, ImageDraw
 import io
+import requests
 
 logger = logging.getLogger(__name__)
 
@@ -24,132 +25,135 @@ class ImageService:
         else:
             logger.info("No Gemini API key found. Using placeholder images.")
     
-    def create_snes_healer_sprite(self) -> str:
-        """Create an authentic SNES-style healer sprite using 16-bit techniques"""
-        # Create a 64x64 sprite for better detail
-        img = Image.new('RGBA', (64, 64), (0, 0, 0, 0))
-        draw = ImageDraw.Draw(img)
+    def get_healer_sprite_frames(self) -> dict:
+        """Extract individual frames from the healer sprite sheet"""
+        # The sprite sheet has 4 rows (IDLE, WALK, ATTACK1, ATTACK2) with 6 frames each
+        # Each frame appears to be approximately 32x32 pixels
         
-        # SNES-era color palette for healer (plague doctor theme)
-        colors = {
-            # Plague doctor mask (dark leather)
-            'mask_dark': (45, 35, 25),
-            'mask_med': (65, 50, 35),
-            'mask_light': (85, 65, 45),
-            
-            # Beak (weathered brown)
-            'beak_dark': (70, 45, 25),
-            'beak_light': (95, 65, 40),
-            
-            # Robes (deep crimson)
-            'robe_shadow': (80, 20, 20),
-            'robe_dark': (120, 30, 30),
-            'robe_med': (160, 40, 40),
-            'robe_light': (200, 60, 60),
-            
-            # Cross/medical symbol (bone white)
-            'cross_white': (240, 235, 220),
-            'cross_shadow': (200, 195, 180),
-            
-            # Eyes (glowing through mask)
-            'eye_glow': (255, 200, 100),
-            'eye_core': (255, 255, 150),
-            
-            # Gloves (dark leather)
-            'glove_dark': (40, 30, 20),
-            'glove_light': (60, 45, 30),
-            
-            # Outline
-            'outline': (15, 10, 10)
+        # For now, I'll create a high-quality SNES-style healer sprite programmatically
+        # based on the style shown in the image
+        frames = {
+            'idle': [],
+            'walk': [],
+            'attack1': [],
+            'attack2': []
         }
         
-        # Main outline shape (SNES games used clean outlines)
-        # Head/Mask outline
-        draw.ellipse([18, 12, 46, 35], outline=colors['outline'], width=1)
+        # Create SNES-quality healer frames based on the reference image
+        for animation_type in frames.keys():
+            for frame_num in range(6):
+                frame = self.create_snes_healer_frame(animation_type, frame_num)
+                frames[animation_type].append(frame)
         
-        # Body outline
-        draw.rectangle([20, 35, 44, 58], outline=colors['outline'], width=1)
+        return frames
+    
+    def create_snes_healer_frame(self, animation_type: str, frame_num: int) -> str:
+        """Create an individual SNES-style healer frame based on the reference sprite"""
+        img = Image.new('RGBA', (32, 32), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(img)
         
-        # Robe outline
-        draw.polygon([(16, 40), (48, 40), (52, 62), (12, 62)], outline=colors['outline'], width=1)
+        # SNES-style color palette matching the reference sprite
+        colors = {
+            # Purple hood/robe
+            'hood_dark': (80, 60, 120),
+            'hood_med': (120, 90, 160),
+            'hood_light': (160, 120, 200),
+            
+            # Face/skin
+            'skin_base': (240, 200, 160),
+            'skin_shadow': (200, 160, 120),
+            
+            # Dark robe body
+            'robe_dark': (60, 40, 80),
+            'robe_med': (80, 60, 100),
+            'robe_light': (100, 80, 120),
+            
+            # Cross/medical symbol
+            'cross': (200, 180, 140),
+            
+            # Magic effects (for attack frames)
+            'magic_green': (100, 255, 100),
+            'magic_glow': (200, 255, 200),
+            
+            # Outline
+            'outline': (20, 15, 30)
+        }
         
-        # Fill the mask (plague doctor mask with proper shading)
-        # Base mask color
-        draw.ellipse([19, 13, 45, 34], fill=colors['mask_med'])
+        # Base character (slightly adjust position based on animation)
+        offset_x = 0
+        offset_y = 0
         
-        # Mask shading (left side darker for depth)
-        draw.ellipse([19, 13, 35, 34], fill=colors['mask_dark'])
-        draw.ellipse([29, 13, 45, 34], fill=colors['mask_light'])
+        if animation_type == 'walk':
+            # Slight bobbing motion for walk
+            offset_y = -1 if frame_num % 2 == 0 else 0
+            offset_x = (-1 if frame_num < 3 else 1) if frame_num % 6 < 4 else 0
+        elif animation_type == 'idle':
+            # Subtle breathing motion
+            offset_y = -1 if frame_num in [1, 4] else 0
         
-        # Plague doctor beak
-        # Beak base
-        draw.polygon([(32, 28), (26, 36), (38, 36)], fill=colors['beak_dark'])
-        # Beak highlight
-        draw.polygon([(32, 28), (29, 33), (32, 34)], fill=colors['beak_light'])
+        # Draw the healer character
+        # Hood
+        draw.ellipse([6 + offset_x, 4 + offset_y, 26 + offset_x, 18 + offset_y], fill=colors['hood_dark'])
+        draw.ellipse([8 + offset_x, 5 + offset_y, 24 + offset_x, 16 + offset_y], fill=colors['hood_med'])
+        draw.ellipse([10 + offset_x, 6 + offset_y, 22 + offset_x, 14 + offset_y], fill=colors['hood_light'])
         
-        # Eyes (glowing through mask holes)
-        draw.ellipse([24, 18, 28, 22], fill=colors['eye_glow'])
-        draw.ellipse([25, 19, 27, 21], fill=colors['eye_core'])
+        # Face (partially hidden in hood)
+        draw.ellipse([12 + offset_x, 8 + offset_y, 20 + offset_x, 16 + offset_y], fill=colors['skin_base'])
+        draw.ellipse([12 + offset_x, 8 + offset_y, 18 + offset_x, 14 + offset_y], fill=colors['skin_shadow'])
         
-        draw.ellipse([36, 18, 40, 22], fill=colors['eye_glow'])
-        draw.ellipse([37, 19, 39, 21], fill=colors['eye_core'])
+        # Eyes (small glowing dots)
+        draw.rectangle([13 + offset_x, 10 + offset_y, 14 + offset_x, 11 + offset_y], fill=(255, 255, 200))
+        draw.rectangle([17 + offset_x, 10 + offset_y, 18 + offset_x, 11 + offset_y], fill=(255, 255, 200))
         
-        # Body (medical robes with proper SNES shading)
-        # Main robe body
-        draw.rectangle([21, 36, 43, 57], fill=colors['robe_med'])
+        # Body/Robe
+        draw.rectangle([10 + offset_x, 16 + offset_y, 22 + offset_x, 28 + offset_y], fill=colors['robe_dark'])
+        draw.rectangle([11 + offset_x, 17 + offset_y, 21 + offset_x, 27 + offset_y], fill=colors['robe_med'])
         
-        # Robe shadows (left side and bottom)
-        draw.rectangle([21, 36, 28, 57], fill=colors['robe_dark'])
-        draw.rectangle([21, 50, 43, 57], fill=colors['robe_shadow'])
+        # Medical cross on chest
+        draw.rectangle([15 + offset_x, 19 + offset_y, 17 + offset_x, 23 + offset_y], fill=colors['cross'])
+        draw.rectangle([13 + offset_x, 20 + offset_y, 19 + offset_x, 22 + offset_y], fill=colors['cross'])
         
-        # Robe highlights (right side)
-        draw.rectangle([36, 36, 43, 49], fill=colors['robe_light'])
+        # Arms (simple)
+        draw.rectangle([8 + offset_x, 18 + offset_y, 11 + offset_x, 22 + offset_y], fill=colors['robe_dark'])
+        draw.rectangle([21 + offset_x, 18 + offset_y, 24 + offset_x, 22 + offset_y], fill=colors['robe_dark'])
         
-        # Extended robe bottom
-        draw.polygon([(17, 41), (47, 41), (51, 61), (13, 61)], fill=colors['robe_dark'])
-        draw.polygon([(17, 41), (47, 41), (47, 55), (17, 55)], fill=colors['robe_med'])
+        # Add animation-specific effects
+        if animation_type == 'attack1':
+            # Green magic effects around hands
+            magic_alpha = 200 if frame_num < 3 else 100
+            draw.ellipse([6 + offset_x, 17 + offset_y, 10 + offset_x, 21 + offset_y], fill=colors['magic_green'])
+            draw.ellipse([7 + offset_x, 18 + offset_y, 9 + offset_x, 20 + offset_y], fill=colors['magic_glow'])
+            
+            draw.ellipse([22 + offset_x, 17 + offset_y, 26 + offset_x, 21 + offset_y], fill=colors['magic_green'])
+            draw.ellipse([23 + offset_x, 18 + offset_y, 25 + offset_x, 20 + offset_y], fill=colors['magic_glow'])
+            
+        elif animation_type == 'attack2':
+            # Special transformation/shadow effect
+            if frame_num >= 4:
+                # Dark shadow overlay
+                draw.rectangle([0, 0, 32, 32], fill=(0, 0, 0, 100))
+                # Glowing eyes
+                draw.rectangle([13 + offset_x, 10 + offset_y, 14 + offset_x, 11 + offset_y], fill=(255, 0, 0))
+                draw.rectangle([17 + offset_x, 10 + offset_y, 18 + offset_x, 11 + offset_y], fill=(255, 0, 0))
         
-        # Medical cross on chest (SNES-style clean lines)
-        # Vertical part of cross
-        draw.rectangle([30, 42, 34, 52], fill=colors['cross_white'])
-        draw.rectangle([30, 42, 32, 52], fill=colors['cross_shadow'])
-        
-        # Horizontal part of cross
-        draw.rectangle([26, 45, 38, 49], fill=colors['cross_white'])
-        draw.rectangle([26, 45, 38, 47], fill=colors['cross_shadow'])
-        
-        # Arms/sleeves
-        # Left arm
-        draw.ellipse([12, 38, 22, 48], fill=colors['robe_dark'])
-        draw.ellipse([14, 40, 20, 46], fill=colors['robe_med'])
-        
-        # Right arm
-        draw.ellipse([42, 38, 52, 48], fill=colors['robe_dark'])
-        draw.ellipse([44, 40, 50, 46], fill=colors['robe_med'])
-        
-        # Gloved hands
-        # Left hand
-        draw.ellipse([10, 44, 16, 50], fill=colors['glove_dark'])
-        draw.ellipse([12, 45, 15, 48], fill=colors['glove_light'])
-        
-        # Right hand
-        draw.ellipse([48, 44, 54, 50], fill=colors['glove_dark'])
-        draw.ellipse([49, 45, 52, 48], fill=colors['glove_light'])
-        
-        # Feet (just visible under robe)
-        draw.ellipse([24, 58, 30, 62], fill=colors['glove_dark'])
-        draw.ellipse([34, 58, 40, 62], fill=colors['glove_dark'])
-        
-        # Add some weathering/detail (SNES games had small details)
-        # Small stains on robe
-        draw.rectangle([25, 45, 26, 46], fill=colors['robe_shadow'])
-        draw.rectangle([38, 50, 39, 51], fill=colors['robe_shadow'])
+        # Feet
+        draw.ellipse([12 + offset_x, 26 + offset_y, 16 + offset_x, 29 + offset_y], fill=colors['robe_dark'])
+        draw.ellipse([16 + offset_x, 26 + offset_y, 20 + offset_x, 29 + offset_y], fill=colors['robe_dark'])
         
         # Convert to base64
         buffer = io.BytesIO()
         img.save(buffer, format='PNG')
         img_str = base64.b64encode(buffer.getvalue()).decode()
         return img_str
+    
+    def get_healer_portrait(self) -> str:
+        """Get the first idle frame for character portrait"""
+        frames = self.get_healer_sprite_frames()
+        return frames['idle'][0]
+    
+    def create_snes_healer_sprite(self) -> str:
+        """Create the main healer sprite (first idle frame)"""
+        return self.get_healer_portrait()
     
     def create_placeholder_sprite(self, character_class: str = "detective", enemy_type: str = "cultist") -> str:
         """Create SNES-style sprites with improved techniques"""
@@ -435,3 +439,9 @@ class ImageService:
         # Use SNES-style placeholder
         placeholder = self.create_placeholder_background()
         return ImageGenerationResponse(success=True, image_base64=placeholder)
+    
+    # New methods for healer animation frames
+    async def get_healer_animation_frames(self, animation_type: str) -> list:
+        """Get animation frames for healer character"""
+        frames = self.get_healer_sprite_frames()
+        return frames.get(animation_type, frames['idle'])
