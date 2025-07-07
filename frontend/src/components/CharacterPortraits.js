@@ -1,6 +1,6 @@
 import React from "react";
 
-// Simple placeholder character portraits as inline SVGs
+// SNES-style character portraits based on the reference sprite
 export const CharacterPortraits = {
   detective: (
     <svg width="48" height="48" viewBox="0 0 48 48" className="pixel-art">
@@ -56,16 +56,34 @@ export const CharacterPortraits = {
   healer: (
     <svg width="48" height="48" viewBox="0 0 48 48" className="pixel-art">
       <rect width="48" height="48" fill="#1a1a2e"/>
-      {/* Plague mask */}
-      <rect x="16" y="12" width="16" height="20" fill="#2f4f4f"/>
-      <rect x="20" y="22" width="8" height="8" fill="#000000"/>
-      {/* Beak */}
-      <rect x="24" y="30" width="4" height="6" fill="#8b4513"/>
-      {/* Medical robes */}
-      <rect x="14" y="32" width="20" height="16" fill="#dc143c"/>
-      {/* Cross symbol */}
-      <rect x="22" y="36" width="4" height="8" fill="#ffffff"/>
-      <rect x="20" y="38" width="8" height="4" fill="#ffffff"/>
+      {/* Purple hood - matching the reference sprite */}
+      <ellipse cx="24" cy="16" rx="12" ry="10" fill="#7860a0"/>
+      <ellipse cx="24" cy="15" rx="10" ry="8" fill="#9480c0"/>
+      <ellipse cx="24" cy="14" rx="8" ry="6" fill="#b0a0e0"/>
+      
+      {/* Face (partially visible in hood) */}
+      <ellipse cx="24" cy="17" rx="6" ry="5" fill="#f0c8a0"/>
+      <ellipse cx="24" cy="16" rx="5" ry="4" fill="#d0a880"/>
+      
+      {/* Glowing eyes */}
+      <rect x="21" y="16" width="2" height="2" fill="#ffff80"/>
+      <rect x="25" y="16" width="2" height="2" fill="#ffff80"/>
+      
+      {/* Dark robe body */}
+      <rect x="16" y="26" width="16" height="18" fill="#403060"/>
+      <rect x="17" y="27" width="14" height="16" fill="#504070"/>
+      
+      {/* Medical cross on chest */}
+      <rect x="22" y="30" width="4" height="8" fill="#c8b490"/>
+      <rect x="20" y="32" width="8" height="4" fill="#c8b490"/>
+      
+      {/* Arms */}
+      <rect x="12" y="28" width="6" height="8" fill="#403060"/>
+      <rect x="30" y="28" width="6" height="8" fill="#403060"/>
+      
+      {/* Feet */}
+      <rect x="18" y="42" width="4" height="4" fill="#403060"/>
+      <rect x="26" y="42" width="4" height="4" fill="#403060"/>
     </svg>
   )
 };
