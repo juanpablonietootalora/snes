@@ -184,14 +184,49 @@ class ImageService:
                 'outline': (20, 30, 20),
                 'coat_white': (240, 240, 240),
                 'coat_shadow': (200, 200, 200),
+                'coat_med': (220, 220, 220),
                 'goggles': (120, 120, 120),
                 'mutation': (100, 255, 100),
                 'skin': (210, 180, 140),
                 'glass': (180, 220, 255)
+            },
+            "cultist": {
+                'outline': (15, 15, 40),
+                'robe_dark': (25, 25, 112),
+                'robe_med': (72, 61, 139),
+                'robe_light': (123, 104, 238),
+                'mask': (40, 40, 60),
+                'skin': (180, 160, 120),
+                'eyes': (255, 0, 0)
+            },
+            "cosmic_horror": {
+                'outline': (30, 40, 20),
+                'body_dark': (85, 107, 47),
+                'body_med': (107, 142, 35),
+                'body_light': (154, 205, 50),
+                'tentacles': (60, 80, 30),
+                'eyes': (255, 255, 100),
+                'slime': (120, 180, 60)
+            },
+            "boss": {
+                'outline': (40, 0, 0),
+                'body_dark': (139, 0, 0),
+                'body_med': (205, 92, 92),
+                'body_light': (255, 160, 122),
+                'flames': (255, 100, 0),
+                'eyes': (255, 255, 255),
+                'shadows': (80, 0, 0)
             }
         }
         
-        sprite_type = character_class if character_class in colors else "detective"
+        # Determine sprite type and get colors
+        if character_class in colors:
+            sprite_type = character_class
+        elif enemy_type in colors:
+            sprite_type = enemy_type
+        else:
+            sprite_type = "detective"
+            
         color_scheme = colors[sprite_type]
         
         # Draw with outlines (SNES style)
@@ -201,7 +236,18 @@ class ImageService:
         
         # Body outline and fill
         draw.rectangle([26, 28, 38, 48], outline=color_scheme['outline'], width=1)
-        draw.rectangle([27, 29, 37, 47], fill=color_scheme.get('coat_med', color_scheme['robe_med']))
+        
+        # Use appropriate body color based on sprite type
+        if 'coat_med' in color_scheme:
+            body_color = color_scheme['coat_med']
+        elif 'robe_med' in color_scheme:
+            body_color = color_scheme['robe_med']
+        elif 'body_med' in color_scheme:
+            body_color = color_scheme['body_med']
+        else:
+            body_color = (100, 100, 100)  # fallback
+            
+        draw.rectangle([27, 29, 37, 47], fill=body_color)
         
         # Add class-specific details with proper SNES styling
         if character_class == "detective":
