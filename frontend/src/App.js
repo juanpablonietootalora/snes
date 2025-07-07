@@ -3,7 +3,7 @@ import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import axios from "axios";
 import { CharacterCreation } from "./components/CharacterCreation";
-import { GameScreen } from "./components/GameScreen";
+import { GameplayScreen } from "./components/GameplayScreen";
 import { CombatScreen } from "./components/CombatScreen";
 import { StoryScreen } from "./components/StoryScreen";
 import { GameProvider } from "./contexts/GameContext";
@@ -76,7 +76,7 @@ const Home = () => {
           {currentScreen === "story" && (
             <StoryScreen 
               onCombat={() => handleScreenChange("combat")}
-              onGameScreen={() => handleScreenChange("game")}
+              onGameScreen={() => handleScreenChange("gameplay")}
             />
           )}
           {currentScreen === "combat" && (
@@ -85,8 +85,8 @@ const Home = () => {
               onGameOver={() => handleScreenChange("character_creation")}
             />
           )}
-          {currentScreen === "game" && (
-            <GameScreen 
+          {currentScreen === "gameplay" && (
+            <GameplayScreen 
               onCombat={() => handleScreenChange("combat")}
               onStory={() => handleScreenChange("story")}
             />
@@ -97,7 +97,7 @@ const Home = () => {
         <footer className="fixed bottom-0 left-0 right-0 bg-black bg-opacity-70 backdrop-blur-sm border-t border-purple-800/30 p-2">
           <div className="max-w-7xl mx-auto flex items-center justify-between text-sm">
             <div className="text-purple-400">
-              Press ESC for menu • WASD to move • Space to interact
+              WASD/Arrows to move • SPACE to interact • ESC for menu
             </div>
             <div className="text-purple-300">
               Demo Version • {new Date().getFullYear()}
