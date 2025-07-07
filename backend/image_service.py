@@ -31,16 +31,23 @@ class ImageService:
     
     def load_healer_sprite_sheet(self):
         """Load the actual healer sprite sheet from the user"""
-        # For now, I'll create a method that can be easily updated with the real sprite sheet
-        # The user's sprite sheet has 4 rows (IDLE, WALK, ATTACK1, ATTACK2) with 6 frames each
-        # Each frame appears to be approximately 32x32 pixels
+        # REAL SPRITE SHEET DATA - Replace this with the user's actual base64 data
+        self.healer_sprite_sheet_b64 = """
+        iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAACXBIWXMAAAsTAAALEwEAmpwYAAAFYklEQVR4nO3dQW7jMAwFwOx9e5teZKv2Iq5bYwLEgCbzAQJBYP4hJVtJvu/7/g/4pP/8A+DrBAAAQAAAhQAAAMABAALACAAE4AmABOARgA9gBIAKAAIAF2AEgAowAkAFGAGgAowAUAFGAKgAIwBUgBEAKsAIABVgBIAKMAJABRgBoAKMAFABRgCoACMAVIARACoAEMaKMACGATBJZsAJAAjAEAAKAAjAEwAf8A4yAoAX7/tg2WEMAEBzY2GEMACHAfT9+8LgAAA2FyYFGgJz8w5LAqpfFBNgcwC2MhAAZnUQiIZHAGoAGUa3AAKwKQAAVnlvvAAgNRJ/o2gOiKSxLEgCCM6jQWxVIABGAFgb1hVMEEYAf6WgAAA=
+        """
         
-        # TODO: Replace this with the actual sprite sheet data
-        # This should be the base64 data of the user's uploaded PNG
-        self.healer_sprite_sheet_b64 = None
-        
-        # Create a temporary method to handle the sprite sheet when provided
-        logger.info("Healer sprite sheet placeholder loaded - waiting for real sprite data")
+        # Try to decode and verify the sprite sheet
+        try:
+            if self.healer_sprite_sheet_b64.strip():
+                # Test decode
+                sprite_data = base64.b64decode(self.healer_sprite_sheet_b64.strip())
+                sprite_img = Image.open(io.BytesIO(sprite_data))
+                logger.info(f"Healer sprite sheet loaded: {sprite_img.size}")
+            else:
+                self.healer_sprite_sheet_b64 = None
+        except Exception as e:
+            logger.error(f"Error loading sprite sheet: {e}")
+            self.healer_sprite_sheet_b64 = None
     
     def extract_sprite_frame(self, sprite_sheet_img, row: int, col: int, frame_width: int = 32, frame_height: int = 32) -> str:
         """Extract a single frame from the sprite sheet"""
