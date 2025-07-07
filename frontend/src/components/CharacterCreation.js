@@ -6,6 +6,7 @@ import { Badge } from "./ui/badge";
 import { Separator } from "./ui/separator";
 import { useGame } from "../contexts/GameContext";
 import { useToast } from "../hooks/use-toast";
+import { CharacterPortraits } from "./CharacterPortraits";
 
 const CHARACTER_CLASSES = [
   {
@@ -124,15 +125,20 @@ export const CharacterCreation = ({ onComplete }) => {
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="text-center">
-              {createdCharacter.sprite_image && (
-                <div className="mx-auto mb-4 w-32 h-32 bg-gray-800 rounded-lg border-2 border-purple-600 flex items-center justify-center overflow-hidden">
+              <div className="mx-auto mb-4 w-32 h-32 bg-gray-800 rounded-lg border-2 border-purple-600 flex items-center justify-center overflow-hidden">
+                {createdCharacter.sprite_image ? (
                   <img 
                     src={`data:image/png;base64,${createdCharacter.sprite_image}`}
                     alt={createdCharacter.name}
                     className="w-full h-full object-cover pixel-art"
                   />
-                </div>
-              )}
+                ) : (
+                  <div className="text-purple-400 text-xs text-center">
+                    {CharacterPortraits[selectedClass.id]}
+                    <br />Character Sprite
+                  </div>
+                )}
+              </div>
               <h2 className="text-2xl font-bold text-purple-200 mb-2">
                 {createdCharacter.name}
               </h2>
@@ -180,10 +186,15 @@ export const CharacterCreation = ({ onComplete }) => {
               onClick={() => setSelectedClass(charClass)}
             >
               <CardHeader className="pb-3">
-                <CardTitle className="text-xl text-purple-200 font-serif">
-                  {charClass.name}
-                </CardTitle>
-                <p className="text-sm text-purple-400">
+                <div className="flex flex-col items-center mb-2">
+                  <div className="mb-2">
+                    {CharacterPortraits[charClass.id]}
+                  </div>
+                  <CardTitle className="text-xl text-purple-200 font-serif">
+                    {charClass.name}
+                  </CardTitle>
+                </div>
+                <p className="text-sm text-purple-400 text-center">
                   {charClass.description}
                 </p>
               </CardHeader>
